@@ -1,11 +1,22 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Button, StyleSheet, Text, View } from 'react-native';
+
+function youIsABitch(bitchState: string) {
+  if (bitchState == "") {
+    return "You is a Bitch."
+  } else {
+    return ""
+  }
+}
 
 export default function App() {
+  const [bitch, setBitch] = useState("");
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <Text>Who is a big dumb bitch? {bitch}</Text>
+      <Button onPress={() => setBitch(youIsABitch(bitch))} title="Find Out Now!"/>
       <StatusBar style="auto" />
     </View>
   );
