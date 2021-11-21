@@ -13,6 +13,8 @@ function youIsABitch(bitchState: string) {
 export default function App() {
   const [bitch, setBitch] = useState("");
 
+  // Read up here for navigation between screens
+  // https://reactnative.dev/docs/navigation
   return (
     <View style={styles.container}>
       <Text>Who is a big dumb bitch? {bitch}</Text>
