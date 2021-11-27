@@ -1,17 +1,27 @@
 import axios from 'axios';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Text, View } from 'react-native';
+import { 
+  Button,
+  Keyboard,
+  KeyboardAvoidingView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View
+} from 'react-native';
 import { Col, Grid, Row } from 'react-native-easy-grid';
 import { styles } from './lib/stylesheet';
 
-type score = {
-  name: string,
-  score: number
+type Score = {
+  name: string;
+  score: number;
 }
 
+const axiosBaseUrl = 'https://scoreboard.r0m4n.com';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -21,9 +31,9 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="Bitch"
+          name="Home"
           component={DumbBitchScreen}
-          options={{ title: "Who Dat Bitch?" }}
+          options={{ title: "Start Or Join A Scoreboard" }}
         />
         <Stack.Screen
           name="Other"
@@ -32,7 +42,7 @@ export default function App() {
         />
         <Stack.Screen
           name="Scores"
-          component={scoreBoardScreen}
+          component={scoreboardScreen}
           options={{ title: "Scoreboard" }}
         />
       </Stack.Navigator>
@@ -40,30 +50,95 @@ export default function App() {
   );
 }
 
-function scoreBoardScreen() {
-  const emptyScoreBoard: score[] = [];
-  const [scoreBoard, setScoreBoard] = useState(emptyScoreBoard);
+type RootStackProps = {
+  Home: undefined;
+  Other: undefined;
+  Score: { gameCode: string };
+}
 
-  async function getScoreBoard() {
-    const game_code = 'test-app';
-    let people: score[] = [];
-    const scores = await axios({
-        url: "/api/scoreboard/" + game_code,
-        baseURL: 'https://scoreboard.r0m4n.com',
-        method: 'get'
+type scoreboardScreenProps = NativeStackScreenProps<RootStackProps, 'Score'>;
+
+function scoreboardScreen({navigation, route}: scoreboardScreenProps) {
+  const gameCode = route.params.gameCode;
+  const scoreboardUrl = axiosBaseUrl + "/api/scoreboard/" + gameCode;
+  navigation.setOptions({ title: gameCode });
+  const emptyScoreBoard: Score[] = [];
+  const [scoreboard, setScoreBoard] = useState(emptyScoreBoard);
+  const [playerNameText, onSubmitPlayerName] = useState('');
+
+  async function refreshScoreBoard() {
+    const previousScore = scoreboard;
+    const scores = await axios.get(scoreboardUrl)
+    .then((response) => {return response.data;})
+    .catch(function (error) {
+      console.log("Error !!!:");
+      console.log(error);
+      return previousScore
+    });
+    setScoreBoard(scores);
+  }
+  
+  async function clearScoreBoard() {
+    await axios.put(scoreboardUrl)
+      .then(() => {
+        refreshScoreBoard();
       })
-      .then((response) => {return response.data;})
       .catch(function (error) {
         console.log("Error !!!:");
         console.log(error);
       });
-    setScoreBoard(scores);
   }
+
+  async function destroyScoreBoard() {
+    await axios.delete(scoreboardUrl)
+      .then(() => {
+        refreshScoreBoard();
+      })
+      .catch(function (error) {
+        console.log("Error !!!:");
+        console.log(error);
+      });
+  }
+
+  async function setPlayerScore(name: string, amount: number, method: string) {
+    await axios
+      .put(
+        scoreboardUrl + "/score/" + name,
+        {
+          'score': amount,
+          'method': method
+        }
+      )
+      .then(() => {
+        refreshScoreBoard();
+      }).catch(function (error) {
+        console.log("Error !!!");
+        console.log(error);
+      });
+  }
+
+  async function addPlayer(name: string, amount: number) {
+    await axios
+      .put(
+        scoreboardUrl + "/score/" + name,
+        {
+          'score': amount
+        }
+      )
+      .then(() => {
+        onSubmitPlayerName('');
+        refreshScoreBoard();
+      }).catch(function (error) {
+        console.log("Error !!!");
+        console.log(error);
+      }); 
+  }
+  async function deletePlayer() {}
 
   const interval: {current: NodeJS.Timeout | null} = useRef(null);
 
   useEffect(() => {
-    interval.current = setInterval(getScoreBoard, 5000);
+    interval.current = setInterval(refreshScoreBoard, 5000);
     return () => {
       clearInterval(interval.current as NodeJS.Timeout);
       interval.current = null;
@@ -72,37 +147,70 @@ function scoreBoardScreen() {
 
   function getRows() {
     const gridRows: JSX.Element[] = [];
-    scoreBoard.forEach((item: score, index: number) => {
+    scoreboard.forEach((item: Score, index: number) => {
       gridRows.push(
         <Row key={ index } style={ styles.row }>
           <Col style={ styles.column }><Text style={ styles.rowNameText }>{ item.name }</Text></Col>
-          <Col style={ styles.column }><Text style={ styles.rowScoreText }>{ item.score }</Text></Col>
+          <Col style={ styles.column }>
+            <View style={ styles.pointsAndButtonWrapper }>
+              <Button title="+" onPress={() => {console.log("plus");}}/>
+              <Text style={ styles.rowScoreText }>{ item.score }</Text>
+            </View>
+          </Col>
         </Row>
       );
     });
     return gridRows;
   }
   function scoresTable() {
+    // const [isAddingPlayer, onAddingPlayer] = useState(false);
+    // function onFocusChange() {
+    //   onAddingPlayer(true)
+    //   console.log(isAddingPlayer);
+    // }
     return (
-      <View style={ styles.table }>
-        <Grid>
-            <Row key="header" style={ styles.header }>
-              <Col style={ styles.column }><Text style={ styles.headerText }>Name</Text></Col>
-              <Col style={ styles.column }><Text style={ styles.headerText }>Score</Text></Col>
-            </Row>
-            { getRows() }
-        </Grid>
-      </View>
+      <Grid style={ styles.table }>
+        <View style={ styles.container }>
+        <ScrollView stickyHeaderIndices={[0]}>
+        <Row key="header" style={ styles.header }>
+          <Col style={ styles.column }><Text style={ styles.headerText }>Name</Text></Col>
+          <Col style={ styles.column }><Text style={ styles.headerText }>Score</Text></Col>
+        </Row>
+        { getRows() }
+        <TextInput
+          autoCapitalize='none'
+          autoCorrect={ false }
+          // autoFocus={ true }
+          enablesReturnKeyAutomatically={ true }
+          onChangeText={ onSubmitPlayerName }
+          // onFocus={onFocusChange}
+          onSubmitEditing={ () => addPlayer(playerNameText, 0) }
+          placeholder="add new player name"
+          returnKeyType="done"
+          style={ styles.playerNameInput }
+          value={ playerNameText }
+          />
+        </ScrollView>
+        </View>
+      </Grid>
     );
   }
 
-  getScoreBoard();
+  refreshScoreBoard();
   return (
-    <View>
-      <Text>Scoreboard for 'test-app'</Text>
-      { scoresTable() }
-      <Button title="Refresh Score" onPress={getScoreBoard}/>
-    </View>
+    <KeyboardAvoidingView 
+      behavior='height'
+      keyboardVerticalOffset={215} 
+      style={ styles.container }
+    >
+      <TouchableWithoutFeedback onPress={ Keyboard.dismiss }>
+        <View>
+          <Button title="Clear ScoreBoard" onPress={clearScoreBoard}/>
+          <Button title="Destroy ScoreBoard" onPress={destroyScoreBoard}/>
+          { scoresTable() }
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -123,7 +231,7 @@ function DumbBitchScreen({ navigation }: any) {
       <Button onPress={() => setBitch(youIsABitch(bitch))} title="Find Out Now!"/>
       <StatusBar style="auto"/>
       <Button onPress={() => navigation.navigate('Other')} title="Find Other News."/>
-      <Button onPress={() => navigation.navigate('Scores')} title="Check Scoreboard."/>
+      <Button onPress={() => navigation.navigate('Scores', { gameCode: 'test-app' })} title="Check Scoreboard."/>
     </View>
   );
 }

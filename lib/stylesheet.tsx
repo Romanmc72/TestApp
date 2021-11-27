@@ -1,9 +1,15 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+let screenWidth = Dimensions.get('window').width;
 
 export const styles = StyleSheet.create({
+  addPointsButton: {
+    textAlign: 'left',
+  },
   column: {
     borderColor: '#000000',
     borderWidth: 2,
+    flex: 1,
   },
   container: {
     alignItems: 'center',
@@ -11,16 +17,28 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  header: { 
-    backgroundColor: '#ABABAB',
+  header: {
+    backgroundColor: '#ff7700',
     borderWidth: 2,
     height: 50,
+    width: screenWidth,
   },
   headerText: {
     color: '#000000',
     fontSize: 32,
     padding: 5,
     textAlign: 'center',
+  },
+  playerNameInput: {
+    borderWidth: 1,
+    flex: 1,
+    flexDirection: 'row',
+    height: 40,
+    margin: 12,
+    padding: 10,
+  },
+  pointsAndButtonWrapper: {
+    flexDirection: 'row',
   },
   row: {
     backgroundColor: '#F7F8FA',
@@ -30,6 +48,7 @@ export const styles = StyleSheet.create({
     borderRightWidth: 2,
     borderBottomWidth: 2,
     height: 40,
+    width: screenWidth
   },
   rowNameText: {
     fontSize: 18,
@@ -45,13 +64,15 @@ export const styles = StyleSheet.create({
     textAlign: 'right',
   },
   table: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
     backgroundColor: '#fff',
     borderColor: '#000000',
     borderRadius: 10,
-    height: 300,
-    padding: 16,
-    paddingTop: 100,
-    width: '100%',
+    flex: 9,
+    justifyContent: 'center',
+    textAlignVertical: 'top',
+    width: screenWidth,
   },
 });
   
