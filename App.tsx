@@ -163,11 +163,6 @@ function scoreboardScreen({navigation, route}: scoreboardScreenProps) {
     return gridRows;
   }
   function scoresTable() {
-    // const [isAddingPlayer, onAddingPlayer] = useState(false);
-    // function onFocusChange() {
-    //   onAddingPlayer(true)
-    //   console.log(isAddingPlayer);
-    // }
     return (
       <Grid style={ styles.table }>
         <View style={ styles.container }>
@@ -180,10 +175,8 @@ function scoreboardScreen({navigation, route}: scoreboardScreenProps) {
         <TextInput
           autoCapitalize='none'
           autoCorrect={ false }
-          // autoFocus={ true }
           enablesReturnKeyAutomatically={ true }
           onChangeText={ onSubmitPlayerName }
-          // onFocus={onFocusChange}
           onSubmitEditing={ () => addPlayer(playerNameText, 0) }
           placeholder="add new player name"
           returnKeyType="done"
