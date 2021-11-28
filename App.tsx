@@ -77,7 +77,7 @@ function scoreboardScreen({navigation, route}: scoreboardScreenProps) {
     });
     setScoreBoard(scores);
   }
-  
+
   async function clearScoreBoard() {
     await axios.put(scoreboardUrl)
       .then(() => {
@@ -133,7 +133,17 @@ function scoreboardScreen({navigation, route}: scoreboardScreenProps) {
         console.log(error);
       }); 
   }
-  async function deletePlayer() {}
+
+  async function deletePlayer(name: string) {
+    await axios
+      .delete(scoreboardUrl + "/score/" + name)
+      .then(() => {
+        refreshScoreBoard();
+      }).catch(function (error) {
+        console.log("Error !!!");
+        console.log(error);
+      }); 
+  }
 
   const interval: {current: NodeJS.Timeout | null} = useRef(null);
 
