@@ -1,10 +1,46 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
 
-let screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get('window').width;
 
 export const styles = StyleSheet.create({
   addPointsButton: {
     textAlign: 'left',
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#b8b8b8',
+    borderRadius: 20,
+    elevation: 2,
+    flex: 1,
+    padding: 10,
+    margin: 1,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    flex: 1,
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  buttonText: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  buttonTextHome: {
+    color: 'black',
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  centeredView: {
+    flex: 1,
+    marginTop: 100,
+    marginBottom: 400,
   },
   column: {
     borderColor: '#000000',
@@ -29,13 +65,68 @@ export const styles = StyleSheet.create({
     padding: 5,
     textAlign: 'center',
   },
+  homeGameCodeInput: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    flexDirection: 'row',
+    height: 40,
+    margin: 12,
+    padding: 10,
+  },
+  homePage: {
+    alignContent: 'center',
+    backgroundColor: '#fff',
+    flex: 1,
+  },
+  homeTextWarning: {
+    color: 'red',
+    fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: '#ff7700',
+    borderColor: '#000000',
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+  picker: {
+    backgroundColor: 'white',
+    flex: 1,
+  },
   playerNameInput: {
+    backgroundColor: 'white',
     borderWidth: 1,
     flex: 1,
     flexDirection: 'row',
     height: 40,
     margin: 12,
     padding: 10,
+  },
+  playerScoreInput: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    color: 'black',
+    flex: 1,
+    flexDirection: 'row',
+    fontSize: 20,
+    height: 40,
+    padding: 10,
+    textAlign: 'right',
+    width: 300,
+  },
+  playerScoreInputContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    padding: 20,
   },
   pointsAndButtonWrapper: {
     flexDirection: 'row',
@@ -48,13 +139,13 @@ export const styles = StyleSheet.create({
     borderRightWidth: 2,
     borderBottomWidth: 2,
     height: 40,
-    width: screenWidth
+    width: screenWidth,
   },
   rowNameText: {
     fontSize: 18,
     color: '#000000',
     padding: 5,
-    paddingLeft: 20
+    paddingLeft: 20,
   },
   rowScoreText: {
     color: '#000000',
@@ -75,4 +166,3 @@ export const styles = StyleSheet.create({
     width: screenWidth,
   },
 });
-  
