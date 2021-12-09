@@ -1,5 +1,4 @@
-import {Picker} from '@react-native-picker/picker';
-import Clipboard from '@react-native-clipboard/clipboard';
+import * as Clipboard from 'expo-clipboard';
 import axios from 'axios';
 import React from 'react';
 import {
@@ -92,16 +91,15 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
     this.gameCode = props.route.params.gameCode;
     props.navigation.setOptions(
         {
-          title: `Game Code: ${this.gameCode}`,
-          // TODO: Get this to work
-          headerRight: () => {
+          headerTitle: () => (<Text>Game Code: {this.gameCode}</Text>),
+          headerRight: () => (
             <Button
               onPress={ () => {
-                Clipboard.setString(baseUrl + 'scoreboard/' + this.gameCode);
+                Clipboard.setString(baseUrl + props.route.params.gameCode);
               } }
               title='Copy Game Code'
-            />;
-          },
+            />
+          ),
         },
     );
     this.scoreboardUrl = axiosBaseUrl + this.gameCode;
@@ -341,56 +339,6 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
       </Grid>
     );
   };
-
-  /**
-   * Fills the player picker with items to pick
-   * @return {JSX.Element} - The individual items populating the picker
-   */
-  renderPlayerPickerItems = (): JSX.Element[] => {
-    const alphabetizedNames: string[] = [];
-    const pickerItems: JSX.Element[] = [];
-    this.state.scoreboard.forEach((item: Score, index: number) => {
-      alphabetizedNames.push(item.name);
-    });
-    alphabetizedNames.sort();
-    alphabetizedNames.forEach((item: string, index: number) => {
-      pickerItems.push(
-          <Picker.Item label={ item } value={ item } key={ index }/>,
-      );
-    });
-    return pickerItems;
-  };
-
-  /**
-   * Renders the picker for picking an existing player to delete
-   * @return {JSX.Element} The player picker component
-   */
-  renderPlayerPicker(): JSX.Element {
-    return (
-      <View style={ styles.container }>
-        <Picker
-          selectedValue={ this.state.modalProps.name }
-          onValueChange={ (itemValue, itemIndex) => {
-            this.setState((state) => {
-              return {
-                scoreboard: state.scoreboard,
-                modalProps: {
-                  inputPoints: state.modalProps.inputPoints,
-                  isVisible: state.modalProps.isVisible,
-                  modalType: state.modalProps.modalType,
-                  name: itemValue,
-                  score: state.modalProps.score,
-                },
-              };
-            });
-          } }
-          style={ styles.picker }
-        >
-          { this.renderPlayerPickerItems() }
-        </Picker>
-      </View>
-    );
-  }
 
   /**
    * This function will render the appropriate modal depending on which modal

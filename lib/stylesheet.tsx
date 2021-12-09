@@ -3,9 +3,6 @@ import {StyleSheet, Dimensions} from 'react-native';
 const screenWidth = Dimensions.get('window').width;
 
 export const styles = StyleSheet.create({
-  addPointsButton: {
-    textAlign: 'left',
-  },
   button: {
     alignItems: 'center',
     backgroundColor: '#b8b8b8',
@@ -97,10 +94,6 @@ export const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-  },
-  picker: {
-    backgroundColor: 'white',
-    flex: 1,
   },
   playerNameInput: {
     backgroundColor: 'white',
