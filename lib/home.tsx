@@ -11,6 +11,8 @@ import {styles} from './stylesheet';
 import {
   BetterButton,
   generateRandomGameCode,
+  getScoreboard,
+  StandardStatusBar,
   validateGameCode,
 } from './utils';
 
@@ -74,6 +76,25 @@ class HomeScreen extends React.Component<
   };
 
   /**
+   * Sends the user to a game code that has been verified has no players
+   */
+  goToRandomOpenGameCode = async () => {
+    const randomGameCode = generateRandomGameCode();
+    await getScoreboard(
+        randomGameCode,
+        (response: any) => {
+          // Empty scoreboards will be an empty array, so if it is not empty it
+          // is occupied and we should try another scoreboard
+          if (JSON.stringify(response.data) == JSON.stringify([])) {
+            this.goToGameCode(randomGameCode);
+          } else {
+            this.goToRandomOpenGameCode();
+          }
+        },
+    );
+  };
+
+  /**
    * Renders the home screen
    * @return {JSX.Element} - The Home Screen app, rendered
    */
@@ -81,6 +102,7 @@ class HomeScreen extends React.Component<
     return (
       <TouchableWithoutFeedback onPress={ Keyboard.dismiss }>
         <View style={ styles.homePage }>
+          <StandardStatusBar/>
           <Text style={ styles.headerText }>
             Type in a Scoreboard Game Code to go to, or get a new random one!
           </Text>
@@ -92,12 +114,21 @@ class HomeScreen extends React.Component<
             autoCorrect={ false }
             enablesReturnKeyAutomatically={ true }
             onChangeText={ (text: string) => {
-              this.setState(() => {
-                return {
-                  gameCode: text,
-                  warning: Warning.default,
-                };
-              });
+              if ((text != '' && validateGameCode(text)) || text == '') {
+                this.setState(() => {
+                  return {
+                    gameCode: text,
+                    warning: Warning.default,
+                  };
+                });
+              } else {
+                this.setState(() => {
+                  return {
+                    gameCode: text,
+                    warning: Warning.invalidGameCode,
+                  };
+                });
+              }
             } }
             placeholder="scoreboard game code"
             returnKeyType="done"
@@ -106,8 +137,7 @@ class HomeScreen extends React.Component<
           />
           <BetterButton
             onPress={ () => {
-              const randomGameCode = generateRandomGameCode();
-              this.goToGameCode(randomGameCode);
+              this.goToRandomOpenGameCode();
             } }
             style={ styles.button }
             textStyle={ styles.buttonTextHome }

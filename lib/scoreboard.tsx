@@ -17,11 +17,15 @@ import {
 import {NavigationParams} from 'react-navigation';
 import {Col, Grid, Row} from 'react-native-easy-grid';
 import {styles} from './stylesheet';
-import {BetterButton} from './utils';
+import {
+  axiosBaseUrl,
+  baseUrl,
+  BetterButton,
+  getScoreboard,
+  StandardStatusBar,
+} from './utils';
 
 const defaultPlayerName = '';
-const baseUrl = 'https://scoreboard.r0m4n.com/';
-const axiosBaseUrl = baseUrl + 'api/scoreboard/';
 const defaultPoints = 0;
 
 enum ModalType {
@@ -50,7 +54,7 @@ type EditScoreModalProps = {
   score: number;
 }
 
-type ScoreBoardScreenState = {
+type ScoreboardScreenState = {
   modalProps: EditScoreModalProps;
   scoreboard: Score[];
 }
@@ -60,7 +64,7 @@ type ScoreBoardScreenState = {
  * its property and state definitions
  */
 abstract class ScoreboardScreenClass extends React.Component<
-  NavigationParams, ScoreBoardScreenState
+  NavigationParams, ScoreboardScreenState
 > {
   gameCode: string;
   interval: NodeJS.Timeout | null;
@@ -71,7 +75,7 @@ abstract class ScoreboardScreenClass extends React.Component<
    */
   constructor(props: NavigationParams) {
     super(props);
-    this.gameCode = '';
+    this.gameCode = props.route.params.gameCode;
     this.interval = null;
     this.scoreboardUrl = axiosBaseUrl + this.gameCode;
   }
@@ -84,9 +88,9 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
   /**
    * Constructs the initial state and properties of the scoreboard
    * @param {NavigationParams} props - The properties for the screen
-   * @param {ScoreBoardScreenState} state - The state of the screen
+   * @param {ScoreboardScreenState} state - The state of the screen
    */
-  constructor(props: NavigationParams, state: ScoreBoardScreenState) {
+  constructor(props: NavigationParams, state: ScoreboardScreenState) {
     super(props);
     this.gameCode = props.route.params.gameCode;
     props.navigation.setOptions(
@@ -95,7 +99,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
           headerRight: () => (
             <Button
               onPress={ () => {
-                Clipboard.setString(baseUrl + props.route.params.gameCode);
+                Clipboard.setString(baseUrl + this.gameCode);
               } }
               title='Copy Game Code'
             />
@@ -138,8 +142,9 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
    * if the API returned scoreboard is different than the current
    */
   refreshScoreBoard = async () => {
-    await axios.get(this.scoreboardUrl)
-        .then((response) => {
+    await getScoreboard(
+        this.gameCode,
+        (response: any) => {
           if (
             JSON.stringify(this.state.scoreboard) ==
             JSON.stringify(response.data)
@@ -155,21 +160,18 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
                   modalType: state.modalProps.modalType,
                   name: state.modalProps.name,
                   score: state.modalProps.name ==
-                    defaultPlayerName ?
-                    defaultPoints :
-                    this.lookupPlayerScore(
-                        state.modalProps.name,
-                        response.data,
-                    ),
+                  defaultPlayerName ?
+                  defaultPoints :
+                  this.lookupPlayerScore(
+                      state.modalProps.name,
+                      response.data,
+                  ),
                 },
               };
             });
           }
-        })
-        .catch(function(this: ScoreboardScreen, error: any) {
-          console.log('Error !!!:');
-          console.log(error);
-        });
+        },
+    );
   };
 
   /**
@@ -232,7 +234,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
    * Adds a player to the scoreboard and optionally a score as well
    * @param {string} name - The name of the player
    * @param {number} amount - The amount to add along with the player
-   * @param {ScoreBoardScreenState} state - The current state of the screen
+   * @param {ScoreboardScreenState} state - The current state of the screen
    */
   addPlayer = async (name: string, amount: number) => {
     await axios
@@ -583,6 +585,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
       >
         <TouchableWithoutFeedback onPress={ Keyboard.dismiss }>
           <View>
+            <StandardStatusBar/>
             <View style={ styles.buttonContainer }>
               <BetterButton
                 style={ styles.button }
