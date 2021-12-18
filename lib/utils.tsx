@@ -112,7 +112,6 @@ export function generateRandomGameCode(): string {
   for ( let i = 0; i < resultLength; i++ ) {
     result += choices.charAt(Math.floor(Math.random() * choicesLength));
   }
-  return 'abcdefg';
   if ( validateGameCode(result) ) {
     return result;
   } else {
