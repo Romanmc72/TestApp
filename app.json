@@ -2,7 +2,8 @@
   "expo": {
     "name": "Scoreboard",
     "slug": "scoreboard",
-    "version": "1.0.0",
+    "scheme": "r0m4nscoreboard",  // adding this https://docs.expo.dev/guides/linking/#linking-to-your-app
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
