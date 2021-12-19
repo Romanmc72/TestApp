@@ -43,11 +43,12 @@ type Score = {
   score: number;
 }
 
+type EmptyString = '';
 type MinusSign = '-';
-type SingedNumericInput = number | MinusSign;
+type SingedNumericInput = number | MinusSign | EmptyString;
 
 type EditScoreModalProps = {
-  inputPoints: number | MinusSign;
+  inputPoints: SingedNumericInput;
   isVisible: boolean | undefined;
   modalType: ModalType;
   name: string;
@@ -109,7 +110,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
     this.scoreboardUrl = axiosBaseUrl + this.gameCode;
     this.state = {
       modalProps: {
-        inputPoints: defaultPoints,
+        inputPoints: '',
         isVisible: false,
         modalType: ModalType.score,
         name: defaultPlayerName,
@@ -212,7 +213,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
   setPlayerScore = async (
       name: string, amount: SingedNumericInput, method: SetPlayerScoreMethod,
   ) => {
-    if (amount == '-') {} else {
+    if (amount == '-' || amount == '') {} else {
       await axios
           .put(
               this.scoreboardUrl + '/score/' + name,
@@ -342,6 +343,16 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
     );
   };
 
+  parseText = (inputText: string): SingedNumericInput => {
+    if (inputText == '-' || inputText == '0-' || inputText == '-0') {
+      return '-'
+    } else if (inputText == '') {
+      return ''
+    } else {
+      return parseInt(inputText) || 0;
+    }
+  }
+
   /**
    * This function will render the appropriate modal depending on which modal
    * was requested by the user
@@ -360,6 +371,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
           <View style={ styles.pointsAndButtonWrapper }>
             <BetterButton
               onPress={ () => {
+                Keyboard.dismiss();
                 this.setPlayerScore(
                     this.state.modalProps.name,
                     this.state.modalProps.inputPoints,
@@ -373,6 +385,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
             />
             <BetterButton
               onPress={ () => {
+                Keyboard.dismiss();
                 this.setPlayerScore(
                     this.state.modalProps.name,
                     this.state.modalProps.inputPoints,
@@ -386,6 +399,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
             />
             <BetterButton
               onPress={ () => {
+                Keyboard.dismiss();
                 this.resetModal();
               } }
               style={ styles.button }
@@ -412,10 +426,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
                 this.setState((state) => {
                   return {
                     modalProps: {
-                      inputPoints: text ==
-                        '0-' ?
-                        '-' :
-                        parseInt(text) || 0,
+                      inputPoints: this.parseText(text),
                       isVisible: state.modalProps.isVisible,
                       modalType: state.modalProps.modalType,
                       name: state.modalProps.name,
@@ -443,6 +454,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
           <View style={ styles.pointsAndButtonWrapper }>
             <BetterButton
               onPress={ () => {
+                Keyboard.dismiss();
                 this.addPlayer(this.state.modalProps.name, 0);
                 this.resetModal();
               } }
@@ -452,6 +464,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
             />
             <BetterButton
               onPress={ () => {
+                Keyboard.dismiss();
                 this.deletePlayer(
                     this.state.modalProps.name,
                 );
@@ -463,6 +476,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
             />
             <BetterButton
               onPress={ () => {
+                Keyboard.dismiss();
                 this.resetModal();
               } }
               style={ styles.button }
@@ -517,10 +531,11 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
           this.resetModal();
         } }
       >
-        <TouchableWithoutFeedback onPress={ Keyboard.dismiss }>
-          <View style={ styles.centeredView }>
-            { this.modalText() }
-          </View>
+        <TouchableWithoutFeedback 
+          style={ styles.centeredView }
+          onPress={ Keyboard.dismiss }
+        >
+          { this.modalText() }
         </TouchableWithoutFeedback>
       </Modal>
     );
@@ -534,7 +549,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
     this.setState((state) => {
       return {
         modalProps: {
-          inputPoints: defaultPoints,
+          inputPoints: '',
           isVisible: !state.modalProps.isVisible,
           modalType: state.modalProps.modalType,
           name: defaultPlayerName,
@@ -564,6 +579,7 @@ export class ScoreboardScreen extends ScoreboardScreenClass {
    * Runs when the screen is closing to remove the auto-refresher
    */
   componentWillUnmount = () => {
+    Keyboard.dismiss();
     clearInterval(this.interval as NodeJS.Timeout);
     this.interval = null;
   };

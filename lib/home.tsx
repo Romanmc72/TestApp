@@ -137,6 +137,7 @@ class HomeScreen extends React.Component<
           />
           <BetterButton
             onPress={ () => {
+              Keyboard.dismiss();
               this.goToRandomOpenGameCode();
             } }
             style={ styles.button }
@@ -145,6 +146,7 @@ class HomeScreen extends React.Component<
           />
           <BetterButton
             onPress={ () => {
+              Keyboard.dismiss();
               this.goToGameCode(this.state.gameCode);
             } }
             style={ styles.button }

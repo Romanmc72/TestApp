@@ -1,4 +1,4 @@
-import {StyleSheet, Dimensions} from 'react-native';
+import {Dimensions, Platform, StyleSheet} from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -36,8 +36,6 @@ export const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    marginTop: 100,
-    marginBottom: 400,
   },
   column: {
     borderColor: '#000000',
@@ -83,6 +81,7 @@ export const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
+    marginTop: Platform.OS === 'ios' ? 100 : 20,
     backgroundColor: '#ff7700',
     borderColor: '#000000',
     borderRadius: 20,
