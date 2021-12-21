@@ -17,3 +17,8 @@ If you have issues with using the scoreboard app, please know that I would be ha
 ## My Patreon
 
 [Patreon](https://www.patreon.com/r0m4n)
+
+
+## Or
+
+Build the app and distribute it yourself, it is open source after all. This repository you are reading the `ISSUES.md` in also contains a `README.md` for the product and the open source license for it as well as links to the other related projects.
